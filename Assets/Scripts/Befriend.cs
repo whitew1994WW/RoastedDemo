@@ -5,16 +5,15 @@ using UnityEngine.UI;
 
 public class Befriend : MonoBehaviour
 {
-    Button button;
+    [SerializeField] Button befriendButton = null;
     // Start is called before the first frame update
     void Start()
     {
-        button = GetComponent<Button>();
-        button.interactable = false;
+        befriendButton.interactable = false;
     }
 
     public void ToggleInteractive()
     {
-        button.interactable = !button.interactable;
+        befriendButton.interactable = !befriendButton.interactable;
     }
 }

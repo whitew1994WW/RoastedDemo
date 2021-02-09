@@ -3618,6 +3618,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30eced5942b054722afb0b63bc500d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  befriendButton: {fileID: 394618944}
 --- !u!114 &394618944
 MonoBehaviour:
   m_ObjectHideFlags: 0

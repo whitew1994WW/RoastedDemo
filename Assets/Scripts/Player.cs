@@ -9,23 +9,14 @@ using Mirror;
 
 public class Player : NetworkBehaviour
 {
-    [Tooltip("In ms-1")] [SerializeField] float moveScaling = 2;
+    [SerializeField] float moveScaling = 2;
     Vector3 moveThrow;
-    public GameObject hud;
-    public Image healthBar;
-    public ParticleSystem throwingStones;
+    [SerializeField] Image healthBar = null;
+    [SerializeField] ParticleSystem throwingStones = null;
 
     bool canShoot = true;
     bool hasFocus = true;
     public float coolDown = 2.0f;
-
-
-    void Start()
-    {
-        throwingStones = GameObject.Find("Stones Particles").GetComponent<ParticleSystem>();
-//        hud = GameObject.Find(this.name + "/CanvasSimple").GetComponent<GameObject>();
- //       healthBar = GameObject.Find(this.name + "/CanvasSimple/Simple/Bars/AttackCooldown").GetComponent<Image>();
-    }
 
     // Update is called once per frame
     [ClientCallback]
@@ -103,11 +94,6 @@ public class Player : NetworkBehaviour
         transform.localPosition = newPos;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        print("Hitting Something");
-    }
-
     private void checkHealth()
     {
         //if (healthBar.fillAmount == 0)
@@ -126,7 +112,7 @@ public class Player : NetworkBehaviour
     }
 
     public override void OnStartLocalPlayer()
-    {
+    { 
         Camera.main.GetComponent<SmoothFollow>().setTarget(gameObject.transform);
     }
 }
