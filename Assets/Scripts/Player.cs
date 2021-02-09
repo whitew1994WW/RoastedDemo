@@ -28,10 +28,11 @@ public class Player : NetworkBehaviour
     }
 
     // Update is called once per frame
+    [ClientCallback]
     void Update()
     {
         //Only update movement if it is the local player doing so
-        if (!isLocalPlayer | !hasFocus)
+        if (!isLocalPlayer | !hasFocus | !hasAuthority)
         {
             return;
         }
