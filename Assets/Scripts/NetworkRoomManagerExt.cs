@@ -6,7 +6,7 @@ namespace Mirror.Examples.NetworkRoom
     [AddComponentMenu("")]
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
-
+        private int playersNamed = 0;
         /// <summary>
         /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
         /// This is the ideal point to pass any data like player name, credentials, tokens, colors, etc.
@@ -15,10 +15,14 @@ namespace Mirror.Examples.NetworkRoom
         /// <param name="roomPlayer"></param>
         /// <param name="gamePlayer"></param>
         /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
-        public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
+        public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer,  GameObject gamePlayer)
         {
+            playersNamed += 1;
+            gamePlayer.name = $"Player {playersNamed}";
+            Debug.Log("Player Connected. Number of players:" + playersNamed);
             return true;
         }
+
 
         public override void OnRoomStopClient()
         {

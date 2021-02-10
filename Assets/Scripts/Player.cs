@@ -11,12 +11,15 @@ public class Player : NetworkBehaviour
 {
     [SerializeField] float moveScaling = 2;
     Vector3 moveThrow;
-    [SerializeField] Image healthBar = null;
     [SerializeField] Weapon weapon = null;
     [SerializeField] Health health = null;
 
     bool hasFocus = true;
     public float coolDown = 2.0f;
+
+
+
+    #region Client
 
     // Update is called once per frame
     [ClientCallback]
@@ -35,7 +38,6 @@ public class Player : NetworkBehaviour
 
     }
 
-    #region Client
     private void OnApplicationFocus(bool focus)
     {
         hasFocus = focus;
@@ -78,6 +80,7 @@ public class Player : NetworkBehaviour
         Camera.main.GetComponent<SmoothFollow>().setTarget(gameObject.transform);
     }
 
+
     #endregion
 
     #region Server
@@ -86,6 +89,13 @@ public class Player : NetworkBehaviour
     public override void OnStartServer()
     {
         Health.ServerOnDie += CmdCheckDeath;
+    }
+
+    [Server]
+    public void SetPlayerName(string newName)
+    {
+        Debug.Log($"Player.cs - SetPlayerName({newName})");
+        this.name = newName;
     }
 
     [ServerCallback]
@@ -110,19 +120,6 @@ public class Player : NetworkBehaviour
     }
 
 
-    [ServerCallback]
-    private void OnParticleCollision(GameObject other)
-    {
-        if (other.tag == "Player" & other.gameObject != this.gameObject)
-        {
-            Debug.Log($"DealingDamage to {other.name}");
 
-            if (other.TryGetComponent<Weapon>(out Weapon enemyWeapon))
-            {
-                health.DealDamage(enemyWeapon.GetDamage());
-            }
-
-        }
-    }
     #endregion
 }
