@@ -1,26 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NumberEnemies : MonoBehaviour
+public class NumberPlayers : NetworkBehaviour
 {
-    public Text numberPlayersText;
     public int numberPlayers = 0;
     public string defaultText = "Challengers Remaining:\n";
+
+    [SerializeField] Text numberPlayersText = null;
     // Start is called before the first frame update
-    void Start()
+    public override void OnStartServer()
     {
-        numberPlayersText = GameObject.Find("UI/NumberEnemies").GetComponent<Text>();
+        Health.ServerOnDie += CountPlayers;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        CountEnemies();
-    }
 
-    private void CountEnemies()
+    private void CountPlayers()
     {
         numberPlayers = 0;
         GameObject[] gameobjects = gameObject.scene.GetRootGameObjects();

@@ -12,9 +12,9 @@ public class Player : NetworkBehaviour
     [SerializeField] float moveScaling = 2;
     Vector3 moveThrow;
     [SerializeField] Image healthBar = null;
-    [SerializeField] ParticleSystem throwingStones = null;
+    [SerializeField] Weapon weapon = null;
+    [SerializeField] Health health = null;
 
-    bool canShoot = true;
     bool hasFocus = true;
     public float coolDown = 2.0f;
 
@@ -32,19 +32,14 @@ public class Player : NetworkBehaviour
         ProcessTranslation();
         ProcessShooting();
         TurnPlayer();
-        UpdateShootBar();
 
     }
 
+    #region Client
     private void OnApplicationFocus(bool focus)
     {
         hasFocus = focus;
         Debug.Log($"Screen Focus is {hasFocus}");
-    }
-
-    private void UpdateShootBar()
-    {
-        //        healthBar.fillAmount = healthBar.fillAmount + Time.deltaTime / coolDown;
     }
 
     private void TurnPlayer()
@@ -59,28 +54,12 @@ public class Player : NetworkBehaviour
 
     private void ProcessShooting()
     {
-        if (Input.GetButtonDown("Fire1") && canShoot)
+        if (Input.GetButtonDown("Fire1"))
         {
 
-            Shoot();
-
-            canShoot = false;
-//            healthBar.fillAmount = 0;
-            Invoke("CooledDown", coolDown);
+            weapon.CmdShoot();
 
         }
-    }
-
-    void Shoot()
-    {
-//        throwingStones.Emit(1);
-    }
-
-    void CooledDown()
-    {
-
-        canShoot = true;
-
     }
 
     private void ProcessTranslation()
@@ -94,25 +73,56 @@ public class Player : NetworkBehaviour
         transform.localPosition = newPos;
     }
 
-    private void checkHealth()
-    {
-        //if (healthBar.fillAmount == 0)
-        //{
-        //    Destroy(this.gameObject);
-        //}
-    }
-
-    private void OnParticleCollision(GameObject other)
-    {
-        print(other.tag);
-    //    print(healthBar);
-   //     healthBar.fillAmount = (float)(healthBar.fillAmount - 0.25);
-    //    print(healthBar.fillAmount);
-        checkHealth();
-    }
-
     public override void OnStartLocalPlayer()
-    { 
+    {
         Camera.main.GetComponent<SmoothFollow>().setTarget(gameObject.transform);
     }
+
+    #endregion
+
+    #region Server
+
+    [ServerCallback]
+    public override void OnStartServer()
+    {
+        Health.ServerOnDie += CmdCheckDeath;
+    }
+
+    [ServerCallback]
+    public override void OnStopServer()
+    {
+        Health.ServerOnDie -= CmdCheckDeath;
+    }
+
+    [Command]
+    private void CmdCheckDeath()
+    {
+        if (health.GetHealth() == 0) {
+            OnDeath();
+        }
+    }
+
+    [ClientRpc]
+    private void OnDeath()
+    {
+
+        Destroy(this.gameObject);
+    }
+
+
+    [ServerCallback]
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.tag == "Player" & other.gameObject != this.gameObject)
+        {
+            Debug.Log($"DealingDamage to {other.name}");
+
+            if (other.TryGetComponent<Weapon>(out Weapon enemyWeapon))
+            {
+                health.DealDamage(enemyWeapon.GetDamage());
+            }
+
+        }
+    }
+    #endregion
 }
