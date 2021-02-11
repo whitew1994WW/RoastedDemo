@@ -90,7 +90,7 @@ public class Player : NetworkBehaviour
     [ServerCallback]
     public override void OnStartServer()
     {
-        Health.ServerOnDie += CmdCheckDeath;
+        health.ServerOnDie += CheckDeath;
     }
 
     [Server]
@@ -103,22 +103,23 @@ public class Player : NetworkBehaviour
     [ServerCallback]
     public override void OnStopServer()
     {
-        Health.ServerOnDie -= CmdCheckDeath;
+        health.ServerOnDie -= CheckDeath;
     }
 
-    [Command]
-    private void CmdCheckDeath()
+    [Server]
+    private void CheckDeath()
     {
+        Debug.Log("Checking Death");
         if (health.GetHealth() == 0) {
             OnDeath();
         }
     }
 
-    [ClientRpc]
+    [Server]
     private void OnDeath()
     {
 
-        Destroy(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
     }
 
     // Function called when hit by a particle attack

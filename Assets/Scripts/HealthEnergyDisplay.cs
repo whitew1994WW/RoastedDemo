@@ -45,12 +45,9 @@ public class HealthEnergyDisplay : NetworkBehaviour
     }
 
     [Client]
-    private void HandleHealthUpdated(int currentHealth, int maxHealth, NetworkIdentity playerId)
+    private void HandleHealthUpdated(int currentHealth, int maxHealth)
     {
-        if (this.netIdentity == playerId) { Debug.Log("Same Id's"); }
-        //{
         healthBarImage.fillAmount = (float)currentHealth / maxHealth;
-        //}
     }
 
     [Client]
