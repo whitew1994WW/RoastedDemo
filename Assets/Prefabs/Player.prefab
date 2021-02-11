@@ -39,7 +39,7 @@ ParticleSystem:
   serializedVersion: 6
   lengthInSec: 5
   simulationSpeed: 1
-  stopAction: 0
+  stopAction: 2
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
@@ -3556,8 +3556,8 @@ ParticleSystem:
     type: 1
     collisionMode: 0
     colliderForce: 0
-    multiplyColliderForceByParticleSize: 0
-    multiplyColliderForceByParticleSpeed: 0
+    multiplyColliderForceByParticleSize: 1
+    multiplyColliderForceByParticleSpeed: 1
     multiplyColliderForceByCollisionAngle: 1
     plane0: {fileID: 0}
     plane1: {fileID: 0}
@@ -4837,6 +4837,7 @@ MonoBehaviour:
   moveScaling: 20
   weapon: {fileID: 754263736100476846}
   health: {fileID: 547824941156441976}
+  part: {fileID: 6645290024086436898}
   coolDown: 1
 --- !u!114 &8363097306415893172
 MonoBehaviour:

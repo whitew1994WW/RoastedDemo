@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine.UI;
 using Mirror;
+using System.ComponentModel;
 
 public class Player : NetworkBehaviour
 {
@@ -13,6 +14,7 @@ public class Player : NetworkBehaviour
     Vector3 moveThrow;
     [SerializeField] Weapon weapon = null;
     [SerializeField] Health health = null;
+    [SerializeField] ParticleSystem part = null;
 
     bool hasFocus = true;
     public float coolDown = 2.0f;
@@ -119,7 +121,33 @@ public class Player : NetworkBehaviour
         Destroy(this.gameObject);
     }
 
+    // Function called when hit by a particle attack
+    [ServerCallback]
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.tag == "Player" & other.name != this.name)
+        {
 
+            List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
+
+            int numCollisionEvents = part.GetCollisionEvents(other, collisionEvents);
+            // If this particle system has registered a collision then this is the wron function call
+            // as it is called on both the player firing and the player being hit
+            if (numCollisionEvents != 0) { return; }
+
+            Debug.Log($"DealingDamage to {this.name} from {other.name}");
+            if (other.TryGetComponent<Weapon>(out Weapon weapon))
+            {
+                if (this.TryGetComponent<Health>(out Health health))
+                {
+                    health.DealDamage(weapon.GetDamage());
+
+
+                }
+            }
+
+        }
+    }
 
     #endregion
 }

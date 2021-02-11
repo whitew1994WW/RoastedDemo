@@ -13,56 +13,82 @@ public class HealthEnergyDisplay : NetworkBehaviour
     [SerializeField] Canvas healthEnergyCanvas = null;
 
     private float energyCoolDown;
+
+    #region Client
+    [ClientCallback]
     private void Awake()
     {
-        Health.ClientOnHealthUpdated += HandleHealthUpdated;
+        health.ClientOnHealthUpdated += HandleHealthUpdated;
         Weapon.EnergyDepleted += HandleEnergyDepleted;
     }
 
-    //Orient the camera after all movement is completed this frame to avoid jittering
+    //Orient the camera after all movement is completed this frame to avoid jitterin
+    [ClientCallback]
     void LateUpdate()
     {
         faceCamera(healthEnergyCanvas);
 
     }
-
+    [Client]
     private void faceCamera(Canvas canvas)
     {
-        canvas.transform.LookAt(canvas.transform.position + Camera.main.transform.rotation * Vector3.forward,
+        canvas.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward,
             Camera.main.transform.rotation * Vector3.up);
     }
 
-    private void Update()
-    {
-        if (energyBarImage.fillAmount < 1) 
-        {
-            energyBarImage.fillAmount += Time.deltaTime / energyCoolDown;
-            energyBarImage.fillAmount = Mathf.Min(energyBarImage.fillAmount, 1);
-        }
-    }
-
-
+    [ClientCallback]
     private void OnDestroy()
     {
-        Health.ClientOnHealthUpdated -= HandleHealthUpdated;
+        health.ClientOnHealthUpdated -= HandleHealthUpdated;
         Weapon.EnergyDepleted -= HandleEnergyDepleted;
 
     }
 
-    private void HandleHealthUpdated(int currentHealth, int maxHealth)
+    [Client]
+    private void HandleHealthUpdated(int currentHealth, int maxHealth, NetworkIdentity playerId)
     {
-        healthBarImage.fillAmount = (float)currentHealth / maxHealth; 
+        if (this.netIdentity == playerId) { Debug.Log("Same Id's"); }
+        //{
+        healthBarImage.fillAmount = (float)currentHealth / maxHealth;
+        //}
     }
 
-    private void HandleEnergyDepleted(float cooldDown)
+    [Client]
+    private void HandleEnergyDepleted(float coolDown)
+    {
+        Debug.Log($"Energy Depleted, sending message to server");
+        CmdEnergyDepleted(coolDown);
+
+    }
+
+    [ClientRpc]
+    private void setEnergyBarCooldown(float fillAmount)
+    {
+        energyBarImage.fillAmount = fillAmount;
+    }
+    #endregion
+
+
+    #region Server
+
+    [Command]
+    private void CmdEnergyDepleted(float coolDown)
     {
         energyBarImage.fillAmount = 0;
-        energyCoolDown = cooldDown;
+        energyCoolDown = coolDown;
     }
 
-    public void SetCamera(Camera camera)
+    [ServerCallback]
+    private void Update()
     {
-        Debug.Log("Setting main camera in canvas");
-        healthEnergyCanvas.worldCamera = camera;
+        if (energyBarImage.fillAmount < 1)
+        {
+            energyBarImage.fillAmount += Time.deltaTime / energyCoolDown;
+            energyBarImage.fillAmount = Mathf.Min(energyBarImage.fillAmount, 1);
+            setEnergyBarCooldown(energyBarImage.fillAmount);
+        }
     }
+
+
+    #endregion
 }
