@@ -60,8 +60,8 @@ public class Weapon : NetworkBehaviour
     {
         stoneEmitter.Emit(1);
         //Activate event that starts the energy bar cooldown
-        Debug.Log($"Sending cooldown message if {isLocalPlayer}");
-        if (isLocalPlayer)
+        Debug.Log($"Sending cooldown message if {hasAuthority}");
+        if (hasAuthority)
         {
             EnergyDepleted?.Invoke(coolDown);
         }

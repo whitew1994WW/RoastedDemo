@@ -298,17 +298,20 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 1753950591579839793, guid: 1560ef6c7e56446579301dc6846c8e8a,
+  playerPrefab: {fileID: 3908239761653462992, guid: 7bcd605b8b6244d55b1425dc4321f1c2,
     type: 3}
   autoCreatePlayer: 1
-  playerSpawnMethod: 0
-  spawnPrefabs: []
+  playerSpawnMethod: 1
+  spawnPrefabs:
+  - {fileID: 1753950591579839793, guid: 1560ef6c7e56446579301dc6846c8e8a, type: 3}
   showRoomGUI: 1
   minPlayers: 1
   roomPlayerPrefab: {fileID: 114033720796874720, guid: deae2134a1d77704b9c595efe69767dd,
     type: 3}
   RoomScene: Assets/Scenes/RoomScene.unity
-  GameplayScene: Assets/Scenes/OnlineScene.unity
+  GameplayScene: Assets/Scenes/Map.unity
   _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
+  roundOverHandlerPrefab: {fileID: 6311365248818255471, guid: 08011841a3c624aef985e4e1759f6206,
+    type: 3}

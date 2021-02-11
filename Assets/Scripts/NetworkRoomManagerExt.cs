@@ -6,6 +6,20 @@ namespace Mirror.Examples.NetworkRoom
     [AddComponentMenu("")]
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
+        [SerializeField] public RoundOverHandler roundOverHandlerPrefab = null;
+
+        public override void OnServerSceneChanged(string sceneName)
+        {
+            base.OnServerSceneChanged(sceneName);
+
+            if (SceneManager.GetActiveScene().name.StartsWith("Map"))
+            {
+                Debug.Log("Spawning RoundHandler");
+                RoundOverHandler roundOverHandlerInstance = Instantiate(roundOverHandlerPrefab);
+                NetworkServer.Spawn(roundOverHandlerInstance.gameObject);
+            }
+        }
+
         private int playersNamed = 0;
         /// <summary>
         /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.

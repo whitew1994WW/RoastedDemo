@@ -11,6 +11,7 @@ public class Health : NetworkBehaviour
     [SerializeField] [SyncVar(hook =nameof(HandleHealthUpdated))] private int currentHealth;
 
     public event Action ServerOnDie;
+    public static event Action ServerStaticOnDie;
     public event Action<int, int> ClientOnHealthUpdated;
     #region Server
     public int GetHealth()
@@ -32,7 +33,7 @@ public class Health : NetworkBehaviour
         Debug.Log($"Health Now: {currentHealth}");
         if (currentHealth != 0) { return; }
         ServerOnDie?.Invoke();
-
+        ServerStaticOnDie?.Invoke();
         Debug.Log("Player Died");
     }
     #endregion

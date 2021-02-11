@@ -54,7 +54,9 @@ public class HealthEnergyDisplay : NetworkBehaviour
     private void HandleEnergyDepleted(float coolDown)
     {
         Debug.Log($"Energy Depleted, sending message to server");
-        CmdEnergyDepleted(coolDown);
+        if (hasAuthority) {
+            CmdEnergyDepleted(coolDown);
+        }
 
     }
 

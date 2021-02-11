@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
@@ -6,28 +7,32 @@ using UnityEngine.UI;
 
 public class NumberPlayers : NetworkBehaviour
 {
-    public int numberPlayers = 0;
+    [SyncVar(hook =nameof(UpdateText))] public int numberPlayers = 0;
     public string defaultText = "Challengers Remaining:\n";
-
     [SerializeField] Text numberPlayersText = null;
-    // Start is called before the first frame update
+
+    [Server]
     public override void OnStartServer()
     {
-        Health.ServerOnDie += CountPlayers;
+        Player.ServerOnPlayerDespawned += PlayerDespawned;
+        Player.ServerOnPlayerSpawned += PlayerSpawned;
+
+    }
+    [Server]
+    private void PlayerDespawned(Player obj)
+    {
+        numberPlayers -= 1;
     }
 
-
-    private void CountPlayers()
+    [Server]
+    private void PlayerSpawned(Player obj)
     {
-        numberPlayers = 0;
-        GameObject[] gameobjects = gameObject.scene.GetRootGameObjects();
-        foreach (GameObject go in gameobjects)
-        {
-            if (go.tag == "Player")
-            {
-                numberPlayers += 1;
-            }
-        }
-        numberPlayersText.text = defaultText + numberPlayers.ToString();
+        numberPlayers += 1;
+    }
+
+    [Client]
+    private void UpdateText(int oldValue, int newValue)
+    {
+        numberPlayersText.text = defaultText + newValue.ToString();
     }
 }

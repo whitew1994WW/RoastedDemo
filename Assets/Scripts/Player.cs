@@ -18,6 +18,9 @@ public class Player : NetworkBehaviour
 
     bool hasFocus = true;
     public float coolDown = 2.0f;
+    public static event Action<Player> ServerOnPlayerDespawned;
+    public static event Action<Player> ServerOnPlayerSpawned;
+
 
 
 
@@ -28,7 +31,7 @@ public class Player : NetworkBehaviour
     void Update()
     {
         //Only update movement if it is the local player doing so
-        if (!isLocalPlayer | !hasFocus | !hasAuthority)
+        if (!hasFocus | !hasAuthority)
         {
             return;
         }
@@ -77,11 +80,6 @@ public class Player : NetworkBehaviour
         transform.localPosition = newPos;
     }
 
-    public override void OnStartLocalPlayer()
-    {
-        Camera.main.GetComponent<SmoothFollow>().setTarget(gameObject.transform);
-    }
-
 
     #endregion
 
@@ -91,6 +89,7 @@ public class Player : NetworkBehaviour
     public override void OnStartServer()
     {
         health.ServerOnDie += CheckDeath;
+        ServerOnPlayerSpawned?.Invoke(this);
     }
 
     [Server]
@@ -118,7 +117,7 @@ public class Player : NetworkBehaviour
     [Server]
     private void OnDeath()
     {
-
+        ServerOnPlayerDespawned?.Invoke(this);
         NetworkServer.Destroy(this.gameObject);
     }
 
