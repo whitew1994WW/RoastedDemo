@@ -7,6 +7,19 @@ namespace Mirror.Examples.NetworkRoom
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
         [SerializeField] public RoundOverHandler roundOverHandlerPrefab = null;
+        [SerializeField] public string shopSceneName = null;
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            RoundOverDisplay.ClientMoveToShopScene += ChangeToShopScene;
+        }
+
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            RoundOverDisplay.ClientMoveToShopScene -= ChangeToShopScene;
+        }
 
         public override void OnServerSceneChanged(string sceneName)
         {
@@ -90,6 +103,11 @@ namespace Mirror.Examples.NetworkRoom
 
                 ServerChangeScene(GameplayScene);
             }
+        }
+
+        public void ChangeToShopScene()
+        {
+            this.ServerChangeScene(shopSceneName);
         }
     }
 }

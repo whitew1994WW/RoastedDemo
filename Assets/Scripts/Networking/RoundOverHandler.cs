@@ -8,6 +8,9 @@ public class RoundOverHandler : NetworkBehaviour
 {
     List<Player> alivePlayers = new List<Player>();
 
+    public static event Action<Player> ClientRoundOver;
+
+
     #region Server
     [Server]
     public override void OnStartServer()
@@ -44,9 +47,11 @@ public class RoundOverHandler : NetworkBehaviour
         }
     }
 
+    [Server]
     private void RoundOver()
     {
         Debug.Log("Round is finished");
+        RpcRoundOver(alivePlayers[0]);
     }
 
     [Server]
@@ -54,5 +59,14 @@ public class RoundOverHandler : NetworkBehaviour
     {
         return alivePlayers.Count;
     }
+    #endregion
+
+    #region client
+    [ClientRpc]
+    private void RpcRoundOver(Player winner)
+    {
+        ClientRoundOver?.Invoke(winner);
+    }
+
     #endregion
 }
