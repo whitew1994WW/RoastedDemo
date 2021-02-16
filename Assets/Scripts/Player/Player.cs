@@ -21,17 +21,34 @@ public class Player : NetworkBehaviour
     public static event Action<Player> ServerOnPlayerDespawned;
     public static event Action<Player> ServerOnPlayerSpawned;
 
-
+    private bool isRoundOver = false;
 
 
     #region Client
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        RoundOverHandler.ClientRoundOver += HandleRoundOver;
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        RoundOverHandler.ClientRoundOver -= HandleRoundOver;
+    }
+
+    private void HandleRoundOver(Player player)
+    {
+        isRoundOver = true;
+    }
 
     // Update is called once per frame
     [ClientCallback]
     void Update()
     {
         //Only update movement if it is the local player doing so
-        if (!hasFocus | !hasAuthority)
+        if (!hasFocus | !hasAuthority | isRoundOver)
         {
             return;
         }

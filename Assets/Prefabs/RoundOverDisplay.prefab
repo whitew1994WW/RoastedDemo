@@ -99,7 +99,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.10588236, g: 0.36078432, b: 0.45882356, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.11120505, g: 0.36219624, b: 0.46226418, a: 1}
+    m_SelectedColor: {r: 0.03529412, g: 0.6039216, b: 0.8588236, a: 0}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -281,7 +281,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7752146785949539797
 RectTransform:
   m_ObjectHideFlags: 0
@@ -526,6 +526,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3692789579741804434}
   - component: {fileID: 7495941446901081135}
+  - component: {fileID: 762064370148467542}
   m_Layer: 0
   m_Name: RoundOverDisplay
   m_TagString: Untagged
@@ -560,6 +561,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5275e246431744c0ba6d542fa906b51a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   winnerText: {fileID: 1721652094815797174}
   gameOverDisplayParent: {fileID: 2793099902022056640}
   uiObjectToDisable: {fileID: 0}
+--- !u!114 &762064370148467542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7584036251292286853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0

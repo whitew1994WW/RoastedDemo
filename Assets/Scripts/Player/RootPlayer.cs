@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System;
+using UnityEngine.SceneManagement;
 
 public class RootPlayer : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPrefab = null;
     private GameObject playerInstance;
 
+    public static event Action ServerMoveToShopScene;
     #region Server
     public override void OnStartServer()
     {
         base.OnStartServer();
-        SpawnPlayer();
+        if (SceneManager.GetActiveScene().name.StartsWith("Map"))
+        {
+            SpawnPlayer();
+        }
     }
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        SetCameraToFollow(playerInstance);
-    }
 
     private void SpawnPlayer()
     {
@@ -32,11 +32,41 @@ public class RootPlayer : NetworkBehaviour
 
     }
 
+    [Command]
+    public void CmdLeaveRound()
+    {
+        Debug.Log("Leaving Round");
+        ServerMoveToShopScene?.Invoke();
+    }
 
     #endregion
 
 
     #region Client
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (SceneManager.GetActiveScene().name.StartsWith("Map"))
+        {
+            RoundOverDisplay.ClientLeaveRound += LeaveRound;
+            SetCameraToFollow(playerInstance);
+        }
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if (SceneManager.GetActiveScene().name.StartsWith("Map"))
+        {
+            RoundOverDisplay.ClientLeaveRound -= LeaveRound;
+        }
+    }
+
+    [Client]
+    public void LeaveRound()
+    {
+        CmdLeaveRound();
+    }
 
     [ClientRpc]
     private void SetCameraToFollow(GameObject obj)
@@ -45,5 +75,7 @@ public class RootPlayer : NetworkBehaviour
             Camera.main.GetComponent<SmoothFollow>().setTarget(obj.transform);
         }
     }
+
+
     #endregion
 }

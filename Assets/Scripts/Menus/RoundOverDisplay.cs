@@ -5,33 +5,45 @@ using Mirror;
 using TMPro;
 using UnityEngine;
 
-public class RoundOverDisplay : MonoBehaviour
+public class RoundOverDisplay : NetworkBehaviour
 {
     [SerializeField] private TMP_Text winnerText = null;
     [SerializeField] private GameObject gameOverDisplayParent = null;
     [SerializeField] private GameObject uiObjectToDisable = null;
-    public static event Action ClientMoveToShopScene;
 
+
+    public static event Action ClientLeaveRound;
+
+    #region Client
+    [Client]
     void Awake()
     {
         RoundOverHandler.ClientRoundOver += ClientHandleRoundOver;
     }
 
+    [Client]
     void OnDestroy()
     {
         RoundOverHandler.ClientRoundOver -= ClientHandleRoundOver;
 
     }
 
-    public void LeaveRound()
-    {
-        ClientMoveToShopScene?.Invoke();
-    }
-
+    [Client]
     public void ClientHandleRoundOver(Player winner)
     {
         gameOverDisplayParent.SetActive(true);
         uiObjectToDisable.SetActive(false);
         winnerText.text = $"{winner.name} has won the round!";
     }
+
+    [Client]
+    public void LeaveRound()
+    {
+        Debug.Log("Calling ClientLeaveRound event");
+        ClientLeaveRound?.Invoke();
+    }
+
+    #endregion
+
+
 }
