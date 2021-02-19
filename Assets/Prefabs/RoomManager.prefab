@@ -65,6 +65,7 @@ MonoBehaviour:
   spawnPrefabs:
   - {fileID: 1753950591579839793, guid: 1560ef6c7e56446579301dc6846c8e8a, type: 3}
   - {fileID: 6311365248818255456, guid: 08011841a3c624aef985e4e1759f6206, type: 3}
+  - {fileID: 3296760200158132681, guid: 0186d88c683424deead5ced792ed85a1, type: 3}
   showRoomGUI: 1
   minPlayers: 1
   roomPlayerPrefab: {fileID: 114033720796874720, guid: deae2134a1d77704b9c595efe69767dd,

@@ -47,6 +47,7 @@ MonoBehaviour:
   sceneId: 0
   serverOnly: 0
   m_AssetId: 
+  hasSpawned: 0
 --- !u!114 &114033720796874720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64,3 +65,5 @@ MonoBehaviour:
   showRoomGUI: 1
   readyToBegin: 0
   index: 0
+  readyUpBarPrefab: {fileID: 3296760200158132681, guid: 0186d88c683424deead5ced792ed85a1,
+    type: 3}

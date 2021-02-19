@@ -8,6 +8,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 {
     [SerializeField] public RoundOverHandler roundOverHandlerPrefab = null;
     [SerializeField] public string shopSceneName = null;
+    private int numberPlayerReadyBars = 0;
 
     public static event Action<NetworkConnection> ClientOnConnected;
     public static event Action<NetworkConnection> ClientOnDisconnected;
@@ -35,6 +36,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             NetworkServer.Spawn(roundOverHandlerInstance.gameObject);
         }
     }
+
 
     private int playersNamed = 0;
     /// <summary>
@@ -66,15 +68,18 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
     public override void OnRoomClientConnect(NetworkConnection conn)
     {
-        base.OnRoomClientConnect(conn);
+        Debug.Log($"Connection is {conn}");
         ClientOnConnected?.Invoke(conn);
+        base.OnRoomClientConnect(conn);
     }
 
     public override void OnRoomClientDisconnect(NetworkConnection conn)
     {
-        base.OnRoomClientDisconnect(conn);
         ClientOnDisconnected?.Invoke(conn);
+        numberPlayerReadyBars -= 1;
+        base.OnRoomClientDisconnect(conn);
     }
+
     public override void OnRoomStopServer()
     {
         // Demonstrates how to get the Network Manager out of DontDestroyOnLoad when

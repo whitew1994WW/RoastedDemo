@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class JoinLobbyMenu : MonoBehaviour
@@ -33,7 +34,8 @@ public class JoinLobbyMenu : MonoBehaviour
 
     private void HandleClientConnected(NetworkConnection conn)
     {
-        joinButton.interactable = true;
+        if (!SceneManager.GetActiveScene().name.StartsWith("Offline")) { return; }
+        joinButton.interactable = false;
     }
 
     private void HandleClientDisconnected(NetworkConnection conn)

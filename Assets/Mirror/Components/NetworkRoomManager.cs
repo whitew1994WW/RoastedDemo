@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -690,6 +691,11 @@ namespace Mirror
 
             if (IsSceneActive(RoomScene))
                 GUI.Box(new Rect(10f, 180f, 520f, 150f), "PLAYERS");
+        }
+
+        public static void GetNumberReadyBars()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
