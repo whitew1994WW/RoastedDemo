@@ -7,54 +7,70 @@ using TMPro;
 
 public class PlayerReadyBar : NetworkBehaviour
 {
-    [SyncVar(hook = nameof(HandleReadyBoolUpdate))] private bool readyBool = false;
-    [SyncVar(hook = nameof(SetPlayer))] uint playerId = 0;
     [SerializeField] TMP_Text readyText = null;
     [SerializeField] TMP_Text notReadyText = null;
+    [SyncVar(hook=nameof(UpdatePlayerId))] private int playerId = -1;
+    [SyncVar(hook=nameof(ClientToggleParentActive))] private bool parentActive = false;
+    [SyncVar(hook = nameof(ClientToggleIsReady))] private bool isReady = false;
 
-    private void HandleReadyBoolUpdate(bool oldBool, bool newBool)
+    public static event Action ClientToggleReadyEvent;
+
+    [Client]
+    private void ClientToggleIsReady(bool oldIsReady, bool newIsReady)
     {
-        readyBool = newBool;
+        UpdateReadyBool(isReady);
+    }
+
+    [Client]
+    private void UpdateReadyBool(bool readyBool)
+    {
         readyText.gameObject.SetActive(readyBool);
         notReadyText.gameObject.SetActive(!readyBool);
     }
 
     [Client]
-    public void ToggleReady()
+    public void TriggerToggleReady()
     {
-        CmdToggleReady();
-    }
-
-    [Server]
-    private void CmdToggleReady()
-    {
-        RpcToggleReady();
-    }
-
-    [ClientRpc]
-    void RpcToggleReady()
-    {
-        readyBool = !readyBool;
-    }
-
-    internal bool HasPlayer()
-    {
-        if (playerId == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        Debug.Log("Has authority, toggling ready");
+        ClientToggleReadyEvent?.Invoke();
     }
 
     [Client]
-    internal void SetPlayer(uint oldNetId, uint newNetId)
+    private void UpdatePlayerId(int oldVar, int newVar)
     {
-        playerId = newNetId;
+        Debug.Log("Setting Player id on client");
+        playerId = newVar;
     }
 
     [Server]
-    internal void ServerSetPlayer(uint netId)
+    public void SetPlayerId(int newId)
     {
-        playerId = netId;
+        Debug.Log("setting player ID on server");
+        playerId = newId;
+    }
+
+    [Server]
+    public void ServerToggleIsReady()
+    {
+        isReady = !isReady;
+    }
+
+    [Server]
+    public int GetPlayerId()
+    {
+        return playerId;
+    }
+
+    [Server]
+    public void ServerToggleParentActive(bool activeBool)
+    {
+        Debug.Log("Setting parent active in ToggleParentActive");
+        parentActive = activeBool;
+    }
+
+    public void ClientToggleParentActive(bool oldBool, bool newBool)
+    {
+        Debug.Log("Setting parent active in hook call");
+        gameObject.transform.parent.gameObject.SetActive(newBool);
     }
 }

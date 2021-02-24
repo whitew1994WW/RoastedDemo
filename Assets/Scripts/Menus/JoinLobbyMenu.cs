@@ -14,13 +14,13 @@ public class JoinLobbyMenu : MonoBehaviour
     private void OnEnable()
     {
         NetworkRoomManagerExt.ClientOnConnected += HandleClientConnected;
-        NetworkRoomManagerExt.ClientOnDisconnected += HandleClientDisconnected;
+        //NetworkRoomManagerExt.ClientOnDisconnected += HandleClientDisconnected;
     }
 
     private void OnDisable()
     {
         NetworkRoomManagerExt.ClientOnConnected -= HandleClientConnected;
-        NetworkRoomManagerExt.ClientOnDisconnected -= HandleClientDisconnected;
+        //NetworkRoomManagerExt.ClientOnDisconnected -= HandleClientDisconnected;
     }
 
     public void JoinGame()
@@ -38,9 +38,9 @@ public class JoinLobbyMenu : MonoBehaviour
         joinButton.interactable = false;
     }
 
-    private void HandleClientDisconnected(NetworkConnection conn)
-    {
-        joinButton.interactable = true;
-    }
+    //private void HandleClientDisconnected(NetworkConnection conn)
+    //{
+    //    joinButton.interactable = true;
+    //}
 
 }
