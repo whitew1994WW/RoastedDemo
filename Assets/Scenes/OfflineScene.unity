@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGUI: 1
+  showGUI: 0
   offsetX: 0
   offsetY: 0
 --- !u!1 &1065579524
@@ -360,6 +360,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3978068424632661452, guid: 80109a868cdcc42538ef1d072105b17e,
         type: 3}
+      propertyPath: readyBarPrefab
+      value: 
+      objectReference: {fileID: 3296760200158132681, guid: 0186d88c683424deead5ced792ed85a1,
+        type: 3}
+    - target: {fileID: 3978068424632661452, guid: 80109a868cdcc42538ef1d072105b17e,
+        type: 3}
       propertyPath: spawnPrefabs.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -367,7 +373,7 @@ PrefabInstance:
         type: 3}
       propertyPath: spawnPrefabs.Array.data[2]
       value: 
-      objectReference: {fileID: 5160558556492332349, guid: 0ada1dabf51fe43c4bcb3b1b405398ce,
+      objectReference: {fileID: 3296760200158132681, guid: 0186d88c683424deead5ced792ed85a1,
         type: 3}
     m_RemovedComponents:
     - {fileID: 3978068424632661454, guid: 80109a868cdcc42538ef1d072105b17e, type: 3}

@@ -24,6 +24,7 @@ public class RoundOverDisplay : NetworkBehaviour
     [Client]
     void OnDestroy()
     {
+        Debug.Log("Object Destroyed");
         RoundOverHandler.ClientRoundOver -= ClientHandleRoundOver;
 
     }

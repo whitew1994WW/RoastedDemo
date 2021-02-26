@@ -9,7 +9,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
     static readonly ILogger logger = LogFactory.GetLogger(typeof(NetworkRoomPlayerExt));
 
-    public static event Action<NetworkConnection> ReadyStateChanged;
+    public static event Action<NetworkConnection> ServerReadyStateChanged;
     #region Client
     [Client]
     public override void OnStartClient()
@@ -23,6 +23,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public override void OnStopClient()
     {
         PlayerReadyBar.ClientToggleReadyEvent -= ToggleReady;
+        base.OnStopClient();
     }
 
 
@@ -39,13 +40,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Command]
     private void CmdReadyStateChanged()
     {
-        ReadyStateChanged?.Invoke(connectionToClient);
+        ServerReadyStateChanged?.Invoke(connectionToClient);
     }
 
     [Client]
     public override void OnClientExitRoom()
     {
         if (logger.LogEnabled()) logger.LogFormat(LogType.Log, "OnClientExitRoom {0}", SceneManager.GetActiveScene().path);
+        base.OnClientExitRoom();
     }
     #endregion
 

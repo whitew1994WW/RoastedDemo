@@ -2,39 +2,115 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
+using System.Collections.Generic;
 
 [AddComponentMenu("")]
 public class NetworkRoomManagerExt : NetworkRoomManager
 {
     [SerializeField] public RoundOverHandler roundOverHandlerPrefab = null;
     [SerializeField] public string shopSceneName = null;
+    [SerializeField] public GameObject readyBarPrefab = null;
 
     public static event Action<NetworkConnection> ClientOnConnected;
     public static event Action<NetworkConnection> ClientOnDisconnected;
+
+    public static event Action ServerAllPlayersReady;
+    public static event Action ServerAllPlayersNotReady;
+
+    private List<GameObject> readyBars = new List<GameObject>();
 
     public override void OnStartServer()
     {
         base.OnStartServer();
         RootPlayer.ServerMoveToShopScene += ChangeToShopScene;
-        NetworkRoomPlayerExt.ReadyStateChanged += ReadyStateChanged;
+        NetworkRoomPlayerExt.ServerReadyStateChanged += ReadyStateChanged;
+        StartButton.ServerStartButtonPressed += ChangeToGamePlayScene;
     }
 
     public override void OnStopServer()
     {
         base.OnStopServer();
         RootPlayer.ServerMoveToShopScene -= ChangeToShopScene;
-        NetworkRoomPlayerExt.ReadyStateChanged -= ReadyStateChanged;
+        NetworkRoomPlayerExt.ServerReadyStateChanged -= ReadyStateChanged;
+        StartButton.ServerStartButtonPressed -= ChangeToGamePlayScene;
     }
 
     public override void OnServerSceneChanged(string sceneName)
     {
         base.OnServerSceneChanged(sceneName);
 
-        if (SceneManager.GetActiveScene().name.StartsWith("Map"))
+        if (IsSceneActive(onlineScene))
         {
             Debug.Log("Spawning RoundHandler");
             RoundOverHandler roundOverHandlerInstance = Instantiate(roundOverHandlerPrefab);
             NetworkServer.Spawn(roundOverHandlerInstance.gameObject);
+        }
+
+        if (IsSceneActive(RoomScene))
+        {
+            // Spawn Ready Bars in
+            GameObject readyBarHolder = null;
+            int i = 1;
+            // Loop until fetching a free ready bar slot
+            while (i <= 10)
+            {
+                string nodeName = $"/PlayerBoxes/Panel/Player ({i})";
+                readyBarHolder = GameObject.Find(nodeName);
+
+                GameObject readyBarInstance = Instantiate(readyBarPrefab, readyBarHolder.transform);
+                readyBarInstance.name = "ReadyBar";
+                Debug.Log("Spawning ReadyBar");
+                readyBars.Add(readyBarInstance);
+                NetworkServer.Spawn(readyBarInstance);
+                i++;
+            }
+        }
+    }
+
+    // Deletes any objects prior to scene change
+    public override void OnServerChangeScene(string newSceneName)
+    {
+        base.OnServerChangeScene(newSceneName);
+        if (IsSceneActive(RoomScene))
+        {
+            // Despawn the ready bars to prevent any errors
+            foreach (GameObject readyBar in readyBars)
+            {
+                NetworkServer.Destroy(readyBar);
+            }
+        } 
+    }
+
+    public override void OnServerAddPlayer(NetworkConnection conn)
+    {
+        base.OnServerAddPlayer(conn);
+        Debug.Log("Server Add Player");
+        Debug.Log($"Connection is {conn.connectionId}");
+        ClientOnConnected?.Invoke(conn);
+        PlayerReadyBar readyBar = null;
+        GameObject readyBarParent = null;
+        int i = 1;
+        // Loop until fetching a free ready bar slot
+        while (i <= 10)
+        {
+            string nodeName = $"/PlayerBoxes/Panel/Player ({i})";
+            readyBarParent = GameObject.Find(nodeName);
+            Debug.Log($"Finding node {nodeName}: {readyBarParent}");
+            Debug.Log($"Children are {readyBarParent.transform.GetChild(0)}");
+            readyBar = readyBarParent.GetComponentInChildren<PlayerReadyBar>(true);
+
+            Debug.Log("Setting ready bar to active");
+            readyBar.ServerToggleParentActive(true);
+
+            Debug.Log($"Trying {nodeName} to see if free, id is {readyBar.GetPlayerId()}");
+            int currentClientId = readyBar.GetPlayerId();
+            if (currentClientId == -1)
+            {
+                Debug.Log($"Setting {nodeName} to player {conn.connectionId}");
+                readyBar.SetPlayerId(conn.connectionId);
+                break;
+            }
+            i++;
         }
     }
 
@@ -42,15 +118,15 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnServerReady(conn);
         PlayerReadyBar readyBar = null;
-        GameObject readyBarObject = null;
+        GameObject readyBarParent = null;
         int i = 1;
         while (i <= 10)
         {
-            string nodeName = $"PlayerBoxes/Panel/Player ({i})/PlayerReadyUpBar";
+            string nodeName = $"/PlayerBoxes/Panel/Player ({i})";
 
-            readyBarObject = GameObject.Find(nodeName);
-            Debug.Log($"Fetching ready bar object from {readyBarObject}");
-            readyBar = readyBarObject.GetComponent<PlayerReadyBar>();
+            readyBarParent = GameObject.Find(nodeName);
+            Debug.Log($"Fetching ready bar object from {readyBarParent}");
+            readyBar = readyBarParent.GetComponentInChildren<PlayerReadyBar>(true);
 
             Debug.Log($"Trying {nodeName} to see if free");
             int currentClientId = readyBar.GetPlayerId();
@@ -58,6 +134,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             {
                 Debug.Log("Calling RpcToggleReady");
                 readyBar.ServerToggleIsReady();
+                // If not ready then make sure the start button is disabled
                 break;
             }
             i++;
@@ -96,31 +173,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     public override void OnServerConnect(NetworkConnection conn)
     {
         base.OnServerConnect(conn);
-        Debug.Log($"Connection is {conn.connectionId}");
-        ClientOnConnected?.Invoke(conn);
-        PlayerReadyBar readyBar = null;
-        GameObject readyBarObject = null;
-        int i = 1;
-        // Loop until fetching a free ready bar
-        while (i <= 10)
-        {
-            string nodeName = $"/PlayerBoxes/Panel/Player ({i})/PlayerReadyUpBar";
-            readyBarObject = GameObject.Find(nodeName);
-            readyBar = readyBarObject.GetComponent<PlayerReadyBar>();
 
-            Debug.Log("Setting ready bar to active");
-            readyBar.ServerToggleParentActive(true);
-
-            Debug.Log($"Trying {nodeName} to see if free, id is {readyBar.GetPlayerId()}");
-            int currentClientId = readyBar.GetPlayerId();
-            if (currentClientId == -1)
-            {
-                Debug.Log($"Setting {nodeName} to player {conn.connectionId}");
-                readyBar.SetPlayerId(conn.connectionId);
-                break;
-            }
-            i++;
-        }
     }
 
 
@@ -131,16 +184,17 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         { 
             ClientOnDisconnected?.Invoke(conn);
             PlayerReadyBar readyBar = null;
-            GameObject readyBarObject = null;
+            GameObject readyBarParent = null;
+           
             int i = 1;
             // Loop until fetching a free ready bar
             while (i <= 10)
             {
 
-                string nodeName = $"/PlayerBoxes/Panel/Player ({i})/PlayerReadyUpBar";
+                string nodeName = $"/PlayerBoxes/Panel/Player ({i})";
 
-                readyBarObject = GameObject.Find(nodeName);
-                readyBar = readyBarObject.GetComponent<PlayerReadyBar>();
+                readyBarParent = GameObject.Find(nodeName);
+                readyBar = readyBarParent.GetComponentInChildren<PlayerReadyBar>(true);
 
                 Debug.Log($"Trying {nodeName} to see if free");
                 int currentClientId = readyBar.GetPlayerId();
@@ -181,25 +235,25 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
     public override void OnRoomServerPlayersReady()
     {
-        // calling the base method calls ServerChangeScene as soon as all players are in Ready state.
-#if UNITY_SERVER
-            base.OnRoomServerPlayersReady();
-#else
         showStartButton = true;
-#endif
+        ServerAllPlayersReady?.Invoke();
     }
 
+    public override void OnRoomServerPlayersNotReady()
+    {
+        ServerAllPlayersNotReady?.Invoke();
+        base.OnRoomServerPlayersNotReady();
+    }
+
+    public void ChangeToGamePlayScene()
+    {
+        base.OnRoomServerPlayersReady();
+    }
+
+    // So that we dont use the GUI they have built
     public override void OnGUI()
     {
-        base.OnGUI();
-
-        if (allPlayersReady && showStartButton && GUI.Button(new Rect(150, 300, 120, 20), "START GAME"))
-        {
-            // set to false to hide it in the game scene
-            showStartButton = false;
-
-            ServerChangeScene(GameplayScene);
-        }
+        return;
     }
 
     public void ChangeToShopScene()

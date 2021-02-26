@@ -28,7 +28,6 @@ public class RootPlayer : NetworkBehaviour
         playerInstance.name = this.name + "Instance";
         Debug.Log("Spawning Player");
         NetworkServer.Spawn(playerInstance, connectionToClient);
-        Debug.Log("Trying to set camera following player instance");
 
     }
 
@@ -46,9 +45,11 @@ public class RootPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        Debug.Log("Client Started");
         if (SceneManager.GetActiveScene().name.StartsWith("Map"))
         {
             RoundOverDisplay.ClientLeaveRound += LeaveRound;
+            Debug.Log("Trying to set camera following player instance");
             SetCameraToFollow(playerInstance);
         }
     }

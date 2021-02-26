@@ -22,6 +22,13 @@ public class PlayerReadyBar : NetworkBehaviour
     }
 
     [Client]
+
+    private void OnDestroy()
+    {
+        NetworkServer.Destroy(this.gameObject);
+    }
+
+    [Client]
     private void UpdateReadyBool(bool readyBool)
     {
         readyText.gameObject.SetActive(readyBool);
@@ -53,6 +60,12 @@ public class PlayerReadyBar : NetworkBehaviour
     public void ServerToggleIsReady()
     {
         isReady = !isReady;
+    }
+
+    [Server]
+    public bool IsPlayerReady()
+    {
+        return isReady;
     }
 
     [Server]

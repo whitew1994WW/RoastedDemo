@@ -24280,6 +24280,11 @@ PrefabInstance:
       propertyPath: sceneId
       value: 3309441969
       objectReference: {fileID: 0}
+    - target: {fileID: 7867812179786353241, guid: ea31f6569b80f47d2925ea08c08a1af3,
+        type: 3}
+      propertyPath: syncInterval
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea31f6569b80f47d2925ea08c08a1af3, type: 3}
 --- !u!1 &7867812179492400182 stripped
@@ -24288,3 +24293,15 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7867812179492400181}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &7867812179492400183
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7867812179492400182}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
